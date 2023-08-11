@@ -25,8 +25,6 @@ import java.util.Set;
 import org.eclipse.osgi.util.NLS;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.accessibility.AccessibleAdapter;
-import org.eclipse.swt.accessibility.AccessibleEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -77,6 +75,7 @@ public class ScopePart {
 	private Button fUseSelection;
 	private Button fUseProject;
 	private Button fUseWorkingSet;
+	private Button fUseLibraries;
 
 	private int fScope;
 	private boolean fCanSearchEnclosingProjects;
@@ -346,54 +345,57 @@ public class ScopePart {
 	 * @return Returns the created part control
 	 */
 	public Composite createPart(Composite parent) {
-		fPart= new Group(parent, SWT.NONE);
+		fPart = new Group(parent, SWT.NONE);
 		fPart.setText(SearchMessages.ScopePart_group_text);
-
-		GridLayout layout= new GridLayout();
-		layout.numColumns= 4;
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 1;
 		fPart.setLayout(layout);
 		fPart.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-		fUseWorkspace= new Button(fPart, SWT.RADIO);
+		// First line: Workspace, Selection, Project, Libraries
+		Composite firstLineComposite = new Composite(fPart, SWT.NONE);
+		GridLayout firstLineLayout = new GridLayout(4, false); // 4 elements in
+																// this row
+		firstLineComposite.setLayout(firstLineLayout);
+		firstLineComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+		fUseWorkspace = new Button(firstLineComposite, SWT.RADIO);
 		fUseWorkspace.setData(Integer.valueOf(ISearchPageContainer.WORKSPACE_SCOPE));
 		fUseWorkspace.setText(SearchMessages.ScopePart_workspaceScope_text);
 
-		fUseSelection= new Button(fPart, SWT.RADIO);
+		fUseSelection = new Button(firstLineComposite, SWT.RADIO);
 		fUseSelection.setData(Integer.valueOf(ISearchPageContainer.SELECTION_SCOPE));
 		fUseSelection.setText(getSelectedResurcesButtonText());
 
-		boolean canSearchInSelection= canSearchInSelection();
+		boolean canSearchInSelection = canSearchInSelection();
 		fUseSelection.setEnabled(canSearchInSelection);
 
-		GridData gd= new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
-		gd.horizontalIndent= 8;
-		fUseSelection.setLayoutData(gd);
+		fUseLibraries = new Button(firstLineComposite, SWT.RADIO);
+		fUseLibraries.setData(Integer.valueOf(ISearchPageContainer.LIBRARIES_SCOPE));
+		fUseLibraries.setText("Libraries");
 
-		fUseProject= new Button(fPart, SWT.RADIO);
+		fUseProject = new Button(firstLineComposite, SWT.RADIO);
 		fUseProject.setData(Integer.valueOf(ISearchPageContainer.SELECTED_PROJECTS_SCOPE));
 		fUseProject.setText(getEnclosingProjectsButtonText());
 		fUseProject.setEnabled(fSearchDialog.getEnclosingProjectNames().length > 0);
 
-		gd= new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
-		gd.horizontalSpan= 2;
-		gd.horizontalIndent= 8;
-		fUseProject.setLayoutData(gd);
-		if (!fCanSearchEnclosingProjects)
-			fUseProject.setVisible(false);
+		// Second line: Working set, Working set text, Choose working set
+		Composite workingSetComposite = new Composite(fPart, SWT.NONE);
+		GridLayout workingSetLayout = new GridLayout(4, false); // 4 columns now
+		workingSetComposite.setLayout(workingSetLayout);
+		workingSetComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-		fUseWorkingSet= new Button(fPart, SWT.RADIO);
+		fUseWorkingSet = new Button(workingSetComposite, SWT.RADIO);
 		fUseWorkingSet.setData(Integer.valueOf(ISearchPageContainer.WORKING_SET_SCOPE));
 		fUseWorkingSet.setText(SearchMessages.ScopePart_workingSetScope_text);
-		fWorkingSetText= new Text(fPart, SWT.SINGLE | SWT.BORDER | SWT.READ_ONLY);
-		fWorkingSetText.getAccessible().addAccessibleListener(new AccessibleAdapter() {
-			@Override
-			public void getName(AccessibleEvent e) {
-				e.result= SearchMessages.ScopePart_workingSetText_accessible_label;
-			}
-		});
 
-		Button chooseWorkingSet= new Button(fPart, SWT.PUSH);
-		chooseWorkingSet.setLayoutData(new GridData());
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2; // Make the text field span 2 columns
+		fWorkingSetText = new Text(workingSetComposite, SWT.SINGLE | SWT.BORDER | SWT.READ_ONLY);
+		fWorkingSetText.setLayoutData(gd);
+
+		Button chooseWorkingSet = new Button(workingSetComposite, SWT.PUSH);
+		chooseWorkingSet.setLayoutData(new GridData(GridData.END, GridData.CENTER, false, false)); // Aligned to the end
 		chooseWorkingSet.setText(SearchMessages.ScopePart_workingSetChooseButton_text);
 		SWTUtil.setButtonDimensionHint(chooseWorkingSet);
 		chooseWorkingSet.addSelectionListener(new SelectionAdapter() {
@@ -421,6 +423,7 @@ public class ScopePart {
 		fUseSelection.addSelectionListener(scopeChangedLister);
 		fUseProject.addSelectionListener(scopeChangedLister);
 		fUseWorkingSet.addSelectionListener(scopeChangedLister);
+		fUseLibraries.addSelectionListener(scopeChangedLister);
 
 		// Set initial scope
 		setSelectedScope(fScope);

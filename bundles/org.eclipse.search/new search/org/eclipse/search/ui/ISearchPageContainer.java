@@ -62,6 +62,13 @@ public interface ISearchPageContainer {
 	public static final int SELECTED_PROJECTS_SCOPE= 3;
 
 	/**
+	 * Libraries Scope (value <code>4</code>).
+	 *
+	 * @since 3.15
+	 */
+	public static final int LIBRARIES_SCOPE = 4;
+
+	/**
 	 * Returns the selection with which this container was opened.
 	 *
 	 * @return the selection passed to this container when it was opened
