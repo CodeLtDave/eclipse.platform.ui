@@ -64,7 +64,7 @@ public interface ISearchPageContainer {
 	/**
 	 * Libraries Scope (value <code>4</code>).
 	 *
-	 * @since 3.15
+	 * @since 3.16
 	 */
 	public static final int LIBRARIES_SCOPE = 4;
 
