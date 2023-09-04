@@ -15,12 +15,16 @@
  *******************************************************************************/
 package org.eclipse.search.internal.core.text;
 
+import java.io.BufferedReader;
 import java.io.CharConversionException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,6 +33,8 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -55,6 +61,7 @@ import org.eclipse.core.filebuffers.ITextFileBuffer;
 import org.eclipse.core.filebuffers.ITextFileBufferManager;
 import org.eclipse.core.filebuffers.LocationKind;
 
+import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 
 import org.eclipse.ui.IEditorInput;
@@ -210,7 +217,8 @@ public class TextSearchVisitor {
 				List<TextSearchMatchAccess> occurences;
 				CharSequence charsequence;
 
-				IDocument document= getOpenDocument(file, getDocumentsInEditors());
+				List<IDocument> documents= getOpenDocument(file, getDocumentsInEditors());
+				for (IDocument document : documents) {
 				if (document != null) {
 					charsequence = new DocumentCharSequence(document);
 					// assume all documents are non-binary
@@ -251,6 +259,7 @@ public class TextSearchVisitor {
 						SearchPlugin.log(e);
 					}
 				}
+			}
 			} catch (UnsupportedCharsetException e) {
 				String[] args= { getCharSetName(file), file.getFullPath().makeRelative().toString()};
 				String message= Messages.format(SearchMessages.TextSearchVisitor_unsupportedcharset, args);
@@ -553,16 +562,67 @@ public class TextSearchVisitor {
 		return message;
 	}
 
-	private IDocument getOpenDocument(IFile file, Map<IFile, IDocument> documentsInEditors) {
-		IDocument document= documentsInEditors.get(file);
-		if (document == null) {
-			ITextFileBufferManager bufferManager= FileBuffers.getTextFileBufferManager();
-			ITextFileBuffer textFileBuffer= bufferManager.getTextFileBuffer(file.getFullPath(), LocationKind.IFILE);
+	// private IDocument getOpenDocument(IFile file, Map<IFile, IDocument>
+	// documentsInEditors) {
+	// IDocument document= documentsInEditors.get(file);
+	// if (document == null) {
+	// ITextFileBufferManager bufferManager=
+	// FileBuffers.getTextFileBufferManager();
+	// ITextFileBuffer textFileBuffer=
+	// bufferManager.getTextFileBuffer(file.getFullPath(), LocationKind.IFILE);
+	// if (textFileBuffer != null) {
+	// document= textFileBuffer.getDocument();
+	// }
+	// }
+	// return document;
+	// }
+
+	private List<IDocument> getOpenDocument(IFile file, Map<IFile, IDocument> documentsInEditors) {
+		List<IDocument> documents = new ArrayList<>();
+		if (documentsInEditors.get(file) == null) {
+			ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager();
+			ITextFileBuffer textFileBuffer = bufferManager.getTextFileBuffer(file.getFullPath(), LocationKind.IFILE);
+
 			if (textFileBuffer != null) {
-				document= textFileBuffer.getDocument();
+				documents.add(textFileBuffer.getDocument());
+			} else if (file.getName().endsWith(".zip") || file.getName().endsWith(".jar")) { //$NON-NLS-1$ //$NON-NLS-2$
+				documents.addAll(extractDocumentsFromZip(file));
 			}
 		}
-		return document;
+
+		return documents;
+	}
+
+	private List<IDocument> extractDocumentsFromZip(IFile zipFile) {
+		try {
+			List<IDocument> documents = new ArrayList<>();
+			ZipFile zip = new ZipFile(zipFile.getLocation().toFile());
+			Enumeration<? extends ZipEntry> entries = zip.entries();
+
+			while (entries.hasMoreElements()) {
+				ZipEntry entry = entries.nextElement();
+
+				if (!entry.isDirectory()) {
+					InputStream inputStream = zip.getInputStream(entry);
+						InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+						BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+						StringBuilder content = new StringBuilder();
+						String line;
+
+						while ((line = bufferedReader.readLine()) != null) {
+							content.append(line).append("\n"); //$NON-NLS-1$
+						}
+
+						// Create a new IDocument and return it
+						documents.add(new Document(content.toString()));
+					}
+				}
+				return documents;
+		} catch (IOException e) {
+			e.printStackTrace(); // Handle the exception appropriately
+		}
+		return null; // No suitable document found in the zip file
 	}
 
 	private String getCharSetName(IFile file) {
