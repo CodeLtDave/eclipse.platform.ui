@@ -217,7 +217,7 @@ public class TextSearchVisitor {
 				List<TextSearchMatchAccess> occurences;
 				CharSequence charsequence;
 
-				List<IDocument> documents= getOpenDocument(file, getDocumentsInEditors());
+				List<IDocument> documents = getOpenDocument(file);
 				for (IDocument document : documents) {
 				if (document != null) {
 					charsequence = new DocumentCharSequence(document);
@@ -577,9 +577,11 @@ public class TextSearchVisitor {
 	// return document;
 	// }
 
-	private List<IDocument> getOpenDocument(IFile file, Map<IFile, IDocument> documentsInEditors) {
+	private List<IDocument> getOpenDocument(IFile file) {
 		List<IDocument> documents = new ArrayList<>();
-		if (documentsInEditors.get(file) == null) {
+		// documents.add(documentsInEditors.get(file));
+		// Param: Map<IFile, IDocument> documentsInEditors
+		if (documents.isEmpty()) {
 			ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager();
 			ITextFileBuffer textFileBuffer = bufferManager.getTextFileBuffer(file.getFullPath(), LocationKind.IFILE);
 
