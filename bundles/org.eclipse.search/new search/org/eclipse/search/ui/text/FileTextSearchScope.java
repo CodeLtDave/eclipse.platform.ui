@@ -15,27 +15,15 @@
 package org.eclipse.search.ui.text;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.content.IContentType;
 
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceProxy;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -49,15 +37,6 @@ import org.eclipse.search.internal.ui.SearchMessages;
 import org.eclipse.search.internal.ui.WorkingSetComparator;
 import org.eclipse.search.internal.ui.text.BasicElementLabels;
 import org.eclipse.search.internal.ui.util.FileTypeEditor;
-
-import org.eclipse.jdt.core.IClasspathEntry;
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragment;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 
 /**
  * A text search scope used by the file search dialog. Additionally to roots it
@@ -90,12 +69,10 @@ public final class FileTextSearchScope extends TextSearchScope {
 	 * @return a scope containing all files in the workspace that match the
 	 *         given file name patterns.
 	 */
-	// public static FileTextSearchScope newWorkspaceScope(String[]
-	// fileNamePatterns, boolean includeDerived) {
-	// return new FileTextSearchScope(SearchMessages.WorkspaceScope,
-	// new IResource[] { ResourcesPlugin.getWorkspace().getRoot() }, null,
-	// fileNamePatterns, includeDerived);
-	// }
+	public static FileTextSearchScope newWorkspaceScope(String[] fileNamePatterns, boolean includeDerived) {
+		return new FileTextSearchScope(SearchMessages.WorkspaceScope,
+				new IResource[] { ResourcesPlugin.getWorkspace().getRoot() }, null, fileNamePatterns, includeDerived);
+	}
 
 	/**
 	 * Returns a scope for the given root resources. The created scope contains
@@ -167,26 +144,29 @@ public final class FileTextSearchScope extends TextSearchScope {
 			String label = SearchMessages.FileTextSearchScope_ws_scope_multiple;
 			description = Messages.format(label, new String[] { workingSets[0].getLabel(), workingSets[1].getLabel() });
 		}
-		FileTextSearchScope scope = new FileTextSearchScope(description, convertToResources(workingSets), workingSets,
+		FileTextSearchScope scope = new FileTextSearchScope(description,
+				convertToResources(workingSets, includeDerived), workingSets,
 				fileNamePatterns, includeDerived);
 		return scope;
 	}
 
-	/**
-	 * @param fileNamePatterns
-	 *            uhad
-	 * @param includeDerived
-	 *            jkshd
-	 * @return kjsd
-	 * @since 3.16
-	 */
-	public static FileTextSearchScope newWorkspaceScope(String[] fileNamePatterns, boolean includeDerived) {
-		IResource[] searchScope = collectAllJarAndClassFilesInWorkspaceAndClasspath();
-		return new FileTextSearchScope(SearchMessages.WorkspaceScope, searchScope, null, fileNamePatterns,
-				includeDerived);
-	}
+	// /**
+	// * @param fileNamePatterns
+	// * uhad
+	// * @param includeDerived
+	// * jkshd
+	// * @return kjsd
+	// * @since 3.16
+	// */
+	// public static FileTextSearchScope newWorkspaceScope(String[]
+	// fileNamePatterns, boolean includeDerived) {
+	// IResource[] searchScope =
+	// collectAllJarAndClassFilesInWorkspaceAndClasspath();
+	// return new FileTextSearchScope(SearchMessages.WorkspaceScope,
+	// searchScope, null, fileNamePatterns,
+	// includeDerived);
+	// }
 
-	// Solution with bytes in Map (not working if trying to turn into Files)
 	// private static IResource[]
 	// collectAllJarAndClassFilesInWorkspaceAndClasspath() {
 	// List<IResource> resources = new ArrayList<>();
@@ -194,6 +174,7 @@ public final class FileTextSearchScope extends TextSearchScope {
 	// IJavaProject[] javaProjects =
 	// JavaCore.create(ResourcesPlugin.getWorkspace().getRoot()).getJavaProjects();
 	// for (IJavaProject javaProject : javaProjects) {
+	// IProject project = javaProject.getProject();
 	// IClasspathEntry[] classpathEntries = javaProject.getRawClasspath();
 	// for (IClasspathEntry entry : classpathEntries) {
 	// if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
@@ -202,24 +183,48 @@ public final class FileTextSearchScope extends TextSearchScope {
 	// javaProject).getClasspathEntries();
 	// for (IClasspathEntry containerEntry : containerEntries) {
 	// if (containerEntry.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
-	// IPath jarPath = containerEntry.getPath();
-	// File jarFile = jarPath.toFile();
-	// if (jarFile.exists()) {
-	// List<File> extractedFiles = new ArrayList<>();
-	// Map<String, byte[]> extractedData = readAllFilesFromJar(jarFile);
-	// Set<Map.Entry<String, byte[]>> set = extractedData.entrySet();
-	// for (Map.Entry<String, byte[]> setEntry : set) {
-	// byte[] content = setEntry.getValue();
-	// File outputFile = new File(setEntry.getKey());
-	// try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
-	// outputStream.write(content);
-	// extractedFiles.add(outputFile);
-	// } catch (IOException e) {
-	// e.printStackTrace();
+	// List<IPath> paths = new ArrayList<>();
+	// IPath path = containerEntry.getPath();
+	// JarFile jar = new JarFile(path.toFile());
+	// Enumeration<JarEntry> entries = jar.entries();
+	// while (entries.hasMoreElements()) {
+	// JarEntry jarEntry = entries.nextElement();
+	// IPath entryPath = new Path(jarEntry.getName());
+	// paths.add(entryPath);
+	// }
+	// for (IPath jarPath : paths) {
+	// IFile file = project.getFile(jarPath);
+	// resources.add(file);
+	// }
+	// IFile file = project.getFile(path);
+	// resources.add(file);
 	// }
 	// }
+	// } else if (entry.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
+	// List<IPath> paths = new ArrayList<>();
+	// IPath path = entry.getPath();
+	// IFile jarFile = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+	// JarFile jar = new JarFile(jarFile.getLocation().toFile());
+	// Enumeration<JarEntry> entries = jar.entries();
+	// while (entries.hasMoreElements()) {
+	// JarEntry jarEntry = entries.nextElement();
+	// IPath entryPath = new Path(jarEntry.getName());
+	// paths.add(entryPath);
 	// }
+	// for (IPath jarPath : paths) {
+	// IFile file = project.getFile(jarPath);
+	// resources.add(file);
 	// }
+	// IFile file = project.getFile(path);
+	// resources.add(file);
+	// } else if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+	// IPath sourcePath = entry.getPath();
+	// IFile file = project.getFile(sourcePath);
+	// if (file instanceof IContainer) {
+	// IContainer sourceContainer = (IContainer) file;
+	// processSourceContainer(sourceContainer, resources);
+	// } else {
+	// resources.add(file);
 	// }
 	// }
 	// }
@@ -227,115 +232,23 @@ public final class FileTextSearchScope extends TextSearchScope {
 	// } catch (Exception e) {
 	// // Handle
 	// }
+	// resources.add(ResourcesPlugin.getWorkspace().getRoot());
 	// return resources.toArray(new IResource[resources.size()]);
 	// }
 
-	// Solution with bytes in Map (not working if trying to turn into Files)
-	// private static Map<String, byte[]> readAllFilesFromJar(File jarFile) {
-	// Map<String, byte[]> extractedFiles = new HashMap<>();
+	// private static void processSourceContainer(IContainer sourceContainer,
+	// List<IResource> resources)
+	// throws CoreException {
+	// IResource[] sourceMembers = sourceContainer.members();
 	//
-	// try (FileInputStream fileInputStream = new FileInputStream(jarFile);
-	// ZipInputStream zipInputStream = new ZipInputStream(fileInputStream)) {
-	//
-	// byte[] buffer = new byte[1024];
-	// int bytesRead;
-	//
-	// ZipEntry entry;
-	// while ((entry = zipInputStream.getNextEntry()) != null) {
-	// if (!entry.isDirectory()) {
-	// ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	// while ((bytesRead = zipInputStream.read(buffer)) != -1) {
-	// baos.write(buffer, 0, bytesRead);
-	// }
-	// extractedFiles.put(entry.getName(), baos.toByteArray());
+	// for (IResource member : sourceMembers) {
+	// if (member instanceof IFile javaSourceFile) {
+	// resources.add(javaSourceFile);
+	// } else if (member instanceof IContainer nestedContainer) {
+	// processSourceContainer(nestedContainer, resources);
 	// }
 	// }
-	//
-	// } catch (IOException e) {
-	// e.printStackTrace();
 	// }
-	//
-	// return extractedFiles;
-	// }
-
-	private static IResource[] collectAllJarAndClassFilesInWorkspaceAndClasspath() {
-		List<IResource> resources = new ArrayList<>();
-		try {
-			IJavaProject[] javaProjects = JavaCore.create(ResourcesPlugin.getWorkspace().getRoot()).getJavaProjects();
-			for (IJavaProject javaProject : javaProjects) {
-				IProject project = javaProject.getProject();
-				IClasspathEntry[] classpathEntries = javaProject.getRawClasspath();
-				for (IClasspathEntry entry : classpathEntries) {
-					if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
-						IClasspathEntry[] containerEntries = JavaCore
-								.getClasspathContainer(entry.getPath(), javaProject).getClasspathEntries();
-						for (IClasspathEntry containerEntry : containerEntries) {
-							if (containerEntry.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
-								List<IPath> paths = new ArrayList<>();
-								IPath path = containerEntry.getPath();
-								JarFile jar = new JarFile(path.toFile());
-								Enumeration<JarEntry> entries = jar.entries();
-								while (entries.hasMoreElements()) {
-									JarEntry jarEntry = entries.nextElement();
-									IPath entryPath = new Path(jarEntry.getName());
-									paths.add(entryPath);
-								}
-								for (IPath jarPath : paths) {
-									IFile file = project.getFile(jarPath);
-									resources.add(file);
-								}
-								IFile file = project.getFile(path);
-								resources.add(file);
-							}
-						}
-					} else if (entry.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
-						List<IPath> paths = new ArrayList<>();
-						IPath path = entry.getPath();
-						IFile jarFile = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
-						JarFile jar = new JarFile(jarFile.getLocation().toFile());
-						Enumeration<JarEntry> entries = jar.entries();
-						while (entries.hasMoreElements()) {
-							JarEntry jarEntry = entries.nextElement();
-							IPath entryPath = new Path(jarEntry.getName());
-							paths.add(entryPath);
-						}
-						for (IPath jarPath : paths) {
-							IFile file = project.getFile(jarPath);
-							resources.add(file);
-						}
-						IFile file = project.getFile(path);
-						resources.add(file);
-					} else if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
-						IPath sourcePath = entry.getPath();
-						IFile file = project.getFile(sourcePath);
-						if (file instanceof IContainer) {
-							IContainer sourceContainer = (IContainer) file;
-							processSourceContainer(sourceContainer, resources);
-						} else {
-							resources.add(file);
-						}
-					}
-				}
-			}
-		} catch (Exception e) {
-			// Handle
-		}
-		resources.add(ResourcesPlugin.getWorkspace().getRoot());
-		return resources.toArray(new IResource[resources.size()]);
-	}
-
-	private static void processSourceContainer(IContainer sourceContainer, List<IResource> resources)
-			throws CoreException {
-		IResource[] sourceMembers = sourceContainer.members();
-
-		for (IResource member : sourceMembers) {
-			if (member instanceof IFile javaSourceFile) {
-				resources.add(javaSourceFile);
-			} else if (member instanceof IContainer nestedContainer) {
-				processSourceContainer(nestedContainer, resources);
-			}
-		}
-	}
 
 	private final String fDescription;
 	private final IResource[] fRootElements;
@@ -482,26 +395,7 @@ public final class FileTextSearchScope extends TextSearchScope {
 		return res.toArray(new IResource[res.size()]);
 	}
 
-	// private static IResource[] convertToResources(IWorkingSet[] workingSets,
-	// boolean includeDerived) {
-	// ArrayList<IResource> res= new ArrayList<>();
-	// for (IWorkingSet workingSet : workingSets) {
-	// if (workingSet.isAggregateWorkingSet() && workingSet.isEmpty()) {
-	// return new IResource[] { ResourcesPlugin.getWorkspace().getRoot() };
-	// }
-	// IAdaptable[] elements= workingSet.getElements();
-	// for (IAdaptable element : elements) {
-	// IResource curr= element.getAdapter(IResource.class);
-	// if (curr != null) {
-	// addToList(res, curr, includeDerived);
-	// }
-	// }
-	// }
-	// return res.toArray(new IResource[res.size()]);
-	// }
-
-	private static IResource[] convertToResources(IWorkingSet[] workingSets) {
-		String searchString = "Test"; //$NON-NLS-1$
+	private static IResource[] convertToResources(IWorkingSet[] workingSets, boolean includeDerived) {
 		ArrayList<IResource> res = new ArrayList<>();
 		for (IWorkingSet workingSet : workingSets) {
 			if (workingSet.isAggregateWorkingSet() && workingSet.isEmpty()) {
@@ -509,91 +403,13 @@ public final class FileTextSearchScope extends TextSearchScope {
 			}
 			IAdaptable[] elements = workingSet.getElements();
 			for (IAdaptable element : elements) {
-				IJavaProject javaProject = JavaCore.create(element.getAdapter(IProject.class));
-				if (javaProject != null && javaProject.exists()) {
-					collectClassFilesFromJavaProject(javaProject, res, searchString);
+				IResource curr = element.getAdapter(IResource.class);
+				if (curr != null) {
+					addToList(res, curr, includeDerived);
 				}
 			}
 		}
 		return res.toArray(new IResource[res.size()]);
-	}
-
-	private static void collectClassFilesFromJavaProject(IJavaProject javaProject, ArrayList<IResource> res,
-			String searchString) {
-		try {
-			IClasspathEntry[] classpathEntries = javaProject.getRawClasspath();
-			for (IClasspathEntry entry : classpathEntries) {
-				IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(entry.getPath());
-				if (resource != null) {
-					if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
-						collectClassFilesFromSourceFolder(javaProject, entry, res, searchString);
-					} else if (entry.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
-						if (resource.getType() == IResource.FILE && resource.getName().toLowerCase().endsWith(".jar")) { //$NON-NLS-1$
-							collectClassFilesFromClasspathJar(resource, res, searchString);
-						}
-					}
-				}
-			}
-		} catch (JavaModelException e) {
-			// Handle the exception
-		}
-	}
-
-	private static void collectClassFilesFromSourceFolder(IJavaProject javaProject, IClasspathEntry entry,
-			ArrayList<IResource> res, String searchString) {
-		try {
-			IPackageFragmentRoot[] roots = javaProject.findPackageFragmentRoots(entry);
-			for (IPackageFragmentRoot root : roots) {
-				IJavaElement[] children = root.getChildren();
-				for (IJavaElement child : children) {
-					if (child.getElementType() == IJavaElement.PACKAGE_FRAGMENT) {
-						IPackageFragment packageFragment = (IPackageFragment) child;
-						ICompilationUnit[] units = packageFragment.getCompilationUnits();
-						for (ICompilationUnit unit : units) {
-							IResource unitResource = unit.getResource();
-							if (unitResource != null) {
-								if (searchStringInCompilationUnit(unit, searchString)) {
-									res.add(unitResource);
-								}
-							}
-						}
-					}
-				}
-			}
-		} catch (JavaModelException e) {
-			// Handle the exception
-		}
-	}
-
-	private static void collectClassFilesFromClasspathJar(IResource jarResource, ArrayList<IResource> res,
-			String searchString) {
-		try (ZipFile zipFile = new ZipFile(jarResource.getLocation().toOSString())) {
-			Enumeration<? extends ZipEntry> entries = zipFile.entries();
-			while (entries.hasMoreElements()) {
-				ZipEntry entry = entries.nextElement();
-				if (entry.getName().endsWith(".class")) { //$NON-NLS-1$
-					try (InputStream inputStream = zipFile.getInputStream(entry)) {
-						byte[] classBytes = inputStream.readAllBytes();
-						String classContent = new String(classBytes);
-						if (classContent.contains(searchString)) {
-							res.add(jarResource);
-						}
-					}
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private static boolean searchStringInCompilationUnit(ICompilationUnit compilationUnit, String searchString) {
-		try {
-			String source = compilationUnit.getSource();
-			return source.contains(searchString);
-		} catch (JavaModelException e) {
-			// Handle the exception
-		}
-		return false;
 	}
 
 	private static void addToList(ArrayList<IResource> res, IResource curr, boolean includeDerived) {
