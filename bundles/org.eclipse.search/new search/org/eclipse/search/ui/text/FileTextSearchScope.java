@@ -150,14 +150,14 @@ public final class FileTextSearchScope extends TextSearchScope {
 		return scope;
 	}
 
-	// /**
-	// * @param fileNamePatterns
-	// * uhad
-	// * @param includeDerived
-	// * jkshd
-	// * @return kjsd
-	// * @since 3.16
-	// */
+	/**
+	 * @param fileNamePatterns
+	 *            uhad
+	 * @param includeDerived
+	 *            jkshd
+	 * @return kjsd
+	 * @since 3.16
+	 */
 	// public static FileTextSearchScope newWorkspaceScope(String[]
 	// fileNamePatterns, boolean includeDerived) {
 	// IResource[] searchScope =
@@ -166,7 +166,7 @@ public final class FileTextSearchScope extends TextSearchScope {
 	// searchScope, null, fileNamePatterns,
 	// includeDerived);
 	// }
-
+	//
 	// private static IResource[]
 	// collectAllJarAndClassFilesInWorkspaceAndClasspath() {
 	// List<IResource> resources = new ArrayList<>();
@@ -235,7 +235,7 @@ public final class FileTextSearchScope extends TextSearchScope {
 	// resources.add(ResourcesPlugin.getWorkspace().getRoot());
 	// return resources.toArray(new IResource[resources.size()]);
 	// }
-
+	//
 	// private static void processSourceContainer(IContainer sourceContainer,
 	// List<IResource> resources)
 	// throws CoreException {

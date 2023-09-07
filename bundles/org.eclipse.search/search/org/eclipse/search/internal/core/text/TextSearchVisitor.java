@@ -53,7 +53,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobGroup;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceStatus;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 
 import org.eclipse.core.filebuffers.FileBuffers;
@@ -83,6 +85,10 @@ import org.eclipse.search.internal.ui.Messages;
 import org.eclipse.search.internal.ui.SearchMessages;
 import org.eclipse.search.internal.ui.SearchPlugin;
 import org.eclipse.search.ui.NewSearchUI;
+
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
 
 /**
  * The visitor that does the actual work.
@@ -165,6 +171,7 @@ public class TextSearchVisitor {
 		private final Map<IFile, IDocument> fDocumentsInEditors;
 		private FileCharSequenceProvider fileCharSequenceProvider;
 		private final int jobCount;
+		private static boolean librariesSearched;
 
 		/**
 		 * Searches for matches in the files.
@@ -179,6 +186,7 @@ public class TextSearchVisitor {
 			this.jobCount = jobCount;
 			setSystem(true);
 			fDocumentsInEditors= documentsInEditors;
+			librariesSearched = false;
 		}
 
 		@Override
@@ -216,8 +224,13 @@ public class TextSearchVisitor {
 
 				List<TextSearchMatchAccess> occurences;
 				CharSequence charsequence;
-
 				List<IDocument> documents = getOpenDocument(file);
+
+				if (!librariesSearched) {
+					librariesSearched = true;
+					documents.addAll(extractInnerFilesFromSystemLibrary());
+				}
+
 				for (IDocument document : documents) {
 				if (document != null) {
 					charsequence = new DocumentCharSequence(document);
@@ -300,6 +313,80 @@ public class TextSearchVisitor {
 			return fDocumentsInEditors;
 		}
 
+		public static List<IDocument> extractInnerFilesFromSystemLibrary() throws CoreException, IOException {
+			List<IDocument> extractedDocuments = new ArrayList<>();
+
+			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+			IProject[] projects = root.getProjects();
+
+			for (IProject project : projects) {
+			if (project.exists()) {
+				IJavaProject javaProject = JavaCore.create(project);
+				IClasspathEntry[] classpathEntries = javaProject.getRawClasspath();
+
+				for (IClasspathEntry entry : classpathEntries) {
+					if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
+						IClasspathEntry[] containerEntries = JavaCore
+								.getClasspathContainer(entry.getPath(), javaProject).getClasspathEntries();
+						for (IClasspathEntry containerEntry : containerEntries) {
+							if (containerEntry.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
+								Pattern pattern = Pattern.compile("sourcePath:([^\\]]+)"); //$NON-NLS-1$
+
+						        // Create a matcher for the input string
+								Matcher matcher = pattern.matcher(containerEntry.toString());
+
+						        // Find the sourcePath attribute and extract the path
+						        if (matcher.find()) {
+						            String sourcePathAttribute = matcher.group(1);
+									extractedDocuments.addAll(extractEntriesFromJar(sourcePathAttribute));
+								}
+								}
+							}
+						}
+
+						}
+					}
+				}
+			return extractedDocuments;
+		}
+
+		private static List<IDocument> extractEntriesFromJar(String jarPath) throws IOException {
+			List<IDocument> extractedDocuments = new ArrayList<>();
+
+			// Open the JAR file as a ZipFile
+			try (ZipFile zipFile = new ZipFile(jarPath)) {
+				Enumeration<? extends ZipEntry> entries = zipFile.entries();
+
+				while (entries.hasMoreElements()) {
+					ZipEntry entry = entries.nextElement();
+
+					// Check if the entry is a file (not a directory)
+					if (!entry.isDirectory()) {
+						// Read the entry's content into a string
+						String content = readEntryContent(zipFile, entry);
+
+						// Create an IDocument for the entry's content
+						IDocument document = new org.eclipse.jface.text.Document(content);
+
+						extractedDocuments.add(document);
+					}
+				}
+			}
+
+			return extractedDocuments;
+		}
+
+		private static String readEntryContent(ZipFile zipFile, ZipEntry entry) throws IOException {
+			try (InputStream entryStream = zipFile.getInputStream(entry)) {
+				StringBuilder content = new StringBuilder();
+				byte[] buffer = new byte[4096];
+				int bytesRead;
+				while ((bytesRead = entryStream.read(buffer)) != -1) {
+					content.append(new String(buffer, 0, bytesRead));
+				}
+				return content.toString();
+			}
+		}
 	}
 
 
