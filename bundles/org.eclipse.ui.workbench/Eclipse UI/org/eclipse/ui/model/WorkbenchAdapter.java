@@ -14,6 +14,14 @@
  *******************************************************************************/
 package org.eclipse.ui.model;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.FontData;
@@ -37,7 +45,40 @@ public abstract class WorkbenchAdapter implements IWorkbenchAdapter, IWorkbenchA
 	 */
 	@Override
 	public Object[] getChildren(Object object) {
+		if (object instanceof IFile) {
+			IFile archiveFile = (IFile) object;
+
+			if (isArchive(archiveFile)) {
+				List<IResource> children = new ArrayList<>();
+
+				try (ZipFile zipFile = new ZipFile(archiveFile.getLocation().toFile())) {
+					Enumeration<? extends ZipEntry> entries = zipFile.entries();
+
+					while (entries.hasMoreElements()) {
+						ZipEntry entry = entries.nextElement();
+						entry.isDirectory();
+						String entryName = entry.getName();
+						IFile childFile = getChildFile(entryName, archiveFile);
+						children.add(childFile);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return children.toArray();
+			}
+		}
 		return NO_CHILDREN;
+	}
+
+	private boolean isArchive(IFile file) {
+		String fileExtension = file.getFileExtension();
+		return fileExtension != null
+				&& (fileExtension.equalsIgnoreCase("zip") || fileExtension.equalsIgnoreCase("jar")); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	private IFile getChildFile(String entryName, IFile archiveFile) {
+		IFile childFile = archiveFile.getProject().getFile(entryName);
+		return childFile;
 	}
 
 	/**
