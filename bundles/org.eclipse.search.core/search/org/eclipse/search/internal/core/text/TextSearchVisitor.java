@@ -22,6 +22,7 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,15 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.workbench.modeling.EPartService;
+
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.IHandler;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -55,7 +65,13 @@ import org.eclipse.core.filebuffers.ITextFileBuffer;
 import org.eclipse.core.filebuffers.ITextFileBufferManager;
 import org.eclipse.core.filebuffers.LocationKind;
 
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
+
 import org.eclipse.jface.text.IDocument;
+
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 
 import org.eclipse.search.core.text.TextSearchMatchAccess;
 import org.eclipse.search.core.text.TextSearchRequestor;
@@ -170,6 +186,10 @@ public class TextSearchVisitor {
 			this.fileCharSequenceProvider= new FileCharSequenceProvider();
 			List<IFile> sameFiles;
 			while (((sameFiles = fileBatches.poll()) != null) && !fFatalError && !fProgressMonitor.isCanceled()) {
+				String fileExtension = sameFiles.get(0).getFileExtension();
+				if (fileExtension.equals("jar") || fileExtension.equals("zip")) { //$NON-NLS-1$ //$NON-NLS-2$
+					executeExpandZipCommand(sameFiles.get(0));
+				}
 				IStatus status = processFile(sameFiles, subMonitor.split(1));
 				// Only accumulate interesting status
 				if (!status.isOK())
@@ -182,6 +202,40 @@ public class TextSearchVisitor {
 				fLock.notify();
 			}
 			return multiStatus;
+		}
+
+		public void executeExpandZipCommand(IFile file) {
+			ICommandService commandService = PlatformUI.getWorkbench().getService(ICommandService.class);
+			if (commandService != null) {
+				String commandId = "org.eclipse.ui.examples.filesystem.expandZip"; //$NON-NLS-1$
+				Map<String, Object> parameters = new HashMap<>();
+				EPartService partService = org.eclipse.e4.ui.workbench.modeling.EPartService.class
+						.cast(PlatformUI.getWorkbench().getService(EPartService.class));
+
+				List<MPart> allParts = (List<MPart>) partService.getParts();
+
+				MPart projectExplorerPart = null;
+				for (MPart part : allParts) {
+					if ("org.eclipse.ui.navigator.ProjectExplorer".equals(part.getElementId())) { //$NON-NLS-1$
+						projectExplorerPart = part;
+					}
+				}
+
+				IEclipseContext context = projectExplorerPart.getContext();
+
+
+				Command command = commandService.getCommand(commandId);
+				IHandler expandHandler = command.getHandler();
+				try {
+					IStructuredSelection selection = new StructuredSelection(file);
+					context.set("selection", selection); //$NON-NLS-1$
+					ExecutionEvent executionEvent = new ExecutionEvent(command, parameters, selection, context);
+
+					expandHandler.execute(executionEvent);
+				} catch (ExecutionException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 
 		public IStatus processFile(List<IFile> sameFiles, IProgressMonitor monitor) {
