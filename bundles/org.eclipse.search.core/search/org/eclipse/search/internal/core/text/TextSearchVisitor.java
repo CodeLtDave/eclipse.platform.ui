@@ -190,8 +190,18 @@ public class TextSearchVisitor {
 			Matcher matcher= fSearchPattern.pattern().isEmpty() ? null : fSearchPattern.matcher(""); //$NON-NLS-1$
 			IFile file = sameFiles.remove(0);
 			monitor.setTaskName(file.getFullPath().toString());
+			boolean isInArchive = false;
+
+			if (file.getLocationURI().getScheme().equals("zip")) { //$NON-NLS-1$
+				isInArchive = true;
+			}
+
 			try {
 				if (!fCollector.acceptFile(file) || matcher == null) {
+					return Status.OK_STATUS;
+				}
+
+				if (!fCollector.reportArchiveFile(file) && isInArchive) {
 					return Status.OK_STATUS;
 				}
 

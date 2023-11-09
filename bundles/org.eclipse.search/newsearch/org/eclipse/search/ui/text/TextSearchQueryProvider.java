@@ -94,6 +94,19 @@ public abstract class TextSearchQueryProvider {
 		}
 
 		/**
+		 * Returns whether archive files are searched.
+		 *
+		 * This implementation returns <code>false</code>, subclasses can
+		 * override.
+		 *
+		 * @return <code>true</code> if archive files are searched
+		 * @since 3.16
+		 */
+		public boolean searchInArchives() {
+			return false;
+		}
+
+		/**
 		 * Returns the scope for the search
 		 *
 		 * @return the scope for the search
