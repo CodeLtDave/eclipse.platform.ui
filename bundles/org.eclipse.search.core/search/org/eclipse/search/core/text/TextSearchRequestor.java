@@ -139,6 +139,36 @@ public abstract class TextSearchRequestor {
 		return false;
 	}
 
+	// TODO Text anpassen
+	/**
+	 * Notification sent that a file might contain binary context. It is the
+	 * choice of the search engine to report binary files and it is the
+	 * heuristic of the search engine to decide that a file could be binary.
+	 * Implementors can decide if the file content should be searched for search
+	 * matches or not.
+	 * <p>
+	 * This call is sent after calls {link {@link #acceptFile(IFile)} that
+	 * return <code>true</code> and before any matches reported for this file
+	 * with {@link #acceptPatternMatch(TextSearchMatchAccess)}.
+	 * </p>
+	 * <p>
+	 * If {@link #canRunInParallel()} returns true, this method may be called in
+	 * parallel by different threads, so any access or updates to collections of
+	 * results or other shared state must be synchronized.
+	 * </p>
+	 * <p>
+	 * The default behaviour is to skip binary files
+	 * </p>
+	 *
+	 * @param file
+	 *            the file that might be binary
+	 * @return If false, no pattern matches will be reported for the content of
+	 *         this file.
+	 */
+	public boolean reportArchiveFile(IFile file) {
+		return false;
+	}
+
 	/**
 	 * Accepts the given search match and decides if the search should continue for this file.
 	 * <p>

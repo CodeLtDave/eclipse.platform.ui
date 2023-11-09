@@ -36,8 +36,9 @@ public class DefaultTextSearchQueryProvider extends TextSearchQueryProvider {
 		boolean caseSensitive= input.isCaseSensitiveSearch();
 		boolean wholeWord= input.isWholeWordSearch();
 		boolean searchInBinaries= input.searchInBinaries();
+		boolean searchInArchives = input.searchInArchives();
 		Assert.isLegal(!(wholeWord && regEx));
-		return new FileSearchQuery(text, regEx, caseSensitive, wholeWord, searchInBinaries, scope);
+		return new FileSearchQuery(text, regEx, caseSensitive, wholeWord, searchInBinaries, scope, searchInArchives);
 	}
 
 	@Override

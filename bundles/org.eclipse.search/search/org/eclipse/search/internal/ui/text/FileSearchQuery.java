@@ -53,15 +53,18 @@ public class FileSearchQuery implements ISearchQuery {
 		private final AbstractTextSearchResult fResult;
 		private final boolean fIsFileSearchOnly;
 		private final boolean fSearchInBinaries;
+		private final boolean fSearchInArchives;
 
 		private final boolean fIsLightweightAutoRefresh;
 		private final ConcurrentHashMap<IFile, ArrayList<FileMatch>> fCachedMatches;
 		private volatile boolean stop;
 
-		private TextSearchResultCollector(AbstractTextSearchResult result, boolean isFileSearchOnly, boolean searchInBinaries) {
+		private TextSearchResultCollector(AbstractTextSearchResult result, boolean isFileSearchOnly,
+				boolean searchInBinaries, boolean searchInArchives) {
 			fResult= result;
 			fIsFileSearchOnly= isFileSearchOnly;
 			fSearchInBinaries= searchInBinaries;
+			fSearchInArchives = searchInArchives;
 			fIsLightweightAutoRefresh= Platform.getPreferencesService().getBoolean(ResourcesPlugin.PI_RESOURCES, ResourcesPlugin.PREF_LIGHTWEIGHT_AUTO_REFRESH, false, null);
 			fCachedMatches = new ConcurrentHashMap<>();
 		}
@@ -85,6 +88,11 @@ public class FileSearchQuery implements ISearchQuery {
 		@Override
 		public boolean reportBinaryFile(IFile file) {
 			return fSearchInBinaries;
+		}
+
+		@Override
+		public boolean reportArchiveFile(IFile file) {
+			return fSearchInArchives;
 		}
 
 		@Override
@@ -202,19 +210,22 @@ public class FileSearchQuery implements ISearchQuery {
 	private final boolean fIsWholeWord;
 	private FileSearchResult fResult;
 	private boolean fSearchInBinaries;
+	private boolean fSearchInArchives;
 
 
 	public FileSearchQuery(String searchText, boolean isRegEx, boolean isCaseSensitive, FileTextSearchScope scope) {
-		this(searchText, isRegEx, isCaseSensitive, false, false, scope);
+		this(searchText, isRegEx, isCaseSensitive, false, false, scope, false);
 	}
 
-	public FileSearchQuery(String searchText, boolean isRegEx, boolean isCaseSensitive, boolean isWholeWord, boolean searchInBinaries, FileTextSearchScope scope) {
+	public FileSearchQuery(String searchText, boolean isRegEx, boolean isCaseSensitive, boolean isWholeWord,
+			boolean searchInBinaries, FileTextSearchScope scope, boolean searchInArchives) {
 		fSearchText= searchText;
 		fIsRegEx= isRegEx;
 		fIsCaseSensitive= isCaseSensitive;
 		fIsWholeWord= isWholeWord;
 		fScope= scope;
 		fSearchInBinaries= searchInBinaries;
+		fSearchInArchives = searchInArchives;
 	}
 
 	public FileTextSearchScope getSearchScope() {
@@ -233,7 +244,8 @@ public class FileSearchQuery implements ISearchQuery {
 
 		Pattern searchPattern= getSearchPattern();
 
-		TextSearchResultCollector collector= new TextSearchResultCollector(textResult, isFileNameSearch(), fSearchInBinaries);
+		TextSearchResultCollector collector = new TextSearchResultCollector(textResult, isFileNameSearch(),
+				fSearchInBinaries, fSearchInArchives);
 		return TextSearchEngine.create().search(fScope, collector, searchPattern, monitor);
 	}
 
@@ -301,7 +313,8 @@ public class FileSearchQuery implements ISearchQuery {
 		FileTextSearchScope scope= FileTextSearchScope.newSearchScope(new IResource[] { file }, new String[] { "*" }, true); //$NON-NLS-1$
 
 		Pattern searchPattern= getSearchPattern();
-		TextSearchResultCollector collector= new TextSearchResultCollector(result, isFileNameSearch(), fSearchInBinaries);
+		TextSearchResultCollector collector = new TextSearchResultCollector(result, isFileNameSearch(),
+				fSearchInBinaries, fSearchInArchives);
 
 		return TextSearchEngine.create().search(scope, collector, searchPattern, monitor);
 	}

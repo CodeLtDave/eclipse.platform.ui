@@ -102,6 +102,7 @@ public class TextSearchPage extends DialogPage implements ISearchPage, IReplaceP
 	private static final String STORE_IS_WHOLE_WORD= "WHOLE_WORD"; //$NON-NLS-1$
 	private static final String STORE_SEARCH_DERIVED = "SEARCH_DERIVED"; //$NON-NLS-1$
 	private static final String STORE_SEARCH_IN_BINARIES = "SEARCH_IN_BINARIES"; //$NON-NLS-1$
+	private static final String STORE_SEARCH_IN_ARCHIVES = "SEARCH_IN_ARCHIVES"; //$NON-NLS-1$
 	private static final String STORE_HISTORY= "HISTORY"; //$NON-NLS-1$
 	private static final String STORE_HISTORY_SIZE= "HISTORY_SIZE"; //$NON-NLS-1$
 
@@ -111,6 +112,7 @@ public class TextSearchPage extends DialogPage implements ISearchPage, IReplaceP
 	 */
 	private static final String STORE_EXTENSIONS= "EXTENSIONS"; //$NON-NLS-1$
 
+
 	private List<SearchPatternData> fPreviousSearchPatterns= new ArrayList<>(HISTORY_SIZE);
 
 	private boolean fFirstTime= true;
@@ -119,6 +121,7 @@ public class TextSearchPage extends DialogPage implements ISearchPage, IReplaceP
 	private boolean fIsWholeWord;
 	private boolean fSearchDerived;
 	private boolean fSearchBinaries;
+	private boolean fSearchArchives;
 
 	private Combo fPattern;
 	private Button fIsCaseSensitiveCheckbox;
@@ -128,6 +131,7 @@ public class TextSearchPage extends DialogPage implements ISearchPage, IReplaceP
 	private CLabel fStatusLabel;
 	private Button fSearchDerivedCheckbox;
 	private Button fSearchBinaryCheckbox;
+	private Button fSearchArchiveCheckbox;
 
 	private ISearchPageContainer fContainer;
 	private FileTypeEditor fFileTypeEditor;
@@ -220,14 +224,17 @@ public class TextSearchPage extends DialogPage implements ISearchPage, IReplaceP
 		private final boolean fIsRegEx;
 		private final boolean fIsWholeWord;
 		private final boolean fSearchInBinaries;
+		private final boolean fSearchInArchives;
 		private final FileTextSearchScope fScope;
 
-		public TextSearchPageInput(String searchText, boolean isCaseSensitive, boolean isRegEx, boolean isWholeWord, boolean searchInBinaries, FileTextSearchScope scope) {
+		public TextSearchPageInput(String searchText, boolean isCaseSensitive, boolean isRegEx, boolean isWholeWord,
+				boolean searchInBinaries, FileTextSearchScope scope, boolean searchInArchives) {
 			fSearchText= searchText;
 			fIsCaseSensitive= isCaseSensitive;
 			fIsRegEx= isRegEx;
 			fIsWholeWord= isWholeWord;
 			fSearchInBinaries= searchInBinaries;
+			fSearchInArchives = searchInArchives;
 			fScope= scope;
 		}
 
@@ -257,6 +264,11 @@ public class TextSearchPage extends DialogPage implements ISearchPage, IReplaceP
 		}
 
 		@Override
+		public boolean searchInArchives() {
+			return fSearchInArchives;
+		}
+
+		@Override
 		public FileTextSearchScope getScope() {
 			return fScope;
 		}
@@ -267,7 +279,8 @@ public class TextSearchPage extends DialogPage implements ISearchPage, IReplaceP
 
 	private ISearchQuery newQuery() throws CoreException {
 		SearchPatternData data= getPatternData();
-		TextSearchPageInput input= new TextSearchPageInput(data.textPattern, data.isCaseSensitive, data.isRegExSearch, data.isWholeWord && !data.isRegExSearch, fSearchBinaries, createTextSearchScope());
+		TextSearchPageInput input = new TextSearchPageInput(data.textPattern, data.isCaseSensitive, data.isRegExSearch,
+				data.isWholeWord && !data.isRegExSearch, fSearchBinaries, createTextSearchScope(), fSearchArchives);
 		return TextSearchQueryProvider.getPreferred().createQuery(input);
 	}
 
@@ -747,6 +760,19 @@ public class TextSearchPage extends DialogPage implements ISearchPage, IReplaceP
 		});
 		fSearchBinaryCheckbox.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 1, 1));
 		fSearchBinaryCheckbox.setFont(searchInGroup.getFont());
+
+		fSearchArchiveCheckbox = new Button(searchInGroup, SWT.CHECK);
+		fSearchArchiveCheckbox.setText(SearchMessages.TextSearchPage_searchArchive_label);
+		fSearchArchiveCheckbox.setSelection(fSearchArchives);
+		fSearchArchiveCheckbox.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				fSearchArchives = fSearchArchiveCheckbox.getSelection();
+				writeConfiguration();
+			}
+		});
+		fSearchArchiveCheckbox.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 1, 1));
+		fSearchArchiveCheckbox.setFont(searchInGroup.getFont());
 	}
 
 	/**
@@ -795,6 +821,7 @@ public class TextSearchPage extends DialogPage implements ISearchPage, IReplaceP
 		fIsWholeWord= s.getBoolean(STORE_IS_WHOLE_WORD);
 		fSearchDerived= s.getBoolean(STORE_SEARCH_DERIVED);
 		fSearchBinaries= s.getBoolean(STORE_SEARCH_IN_BINARIES);
+		fSearchArchives = s.getBoolean(STORE_SEARCH_IN_ARCHIVES);
 
 		try {
 			int historySize= s.getInt(STORE_HISTORY_SIZE);
@@ -837,6 +864,7 @@ public class TextSearchPage extends DialogPage implements ISearchPage, IReplaceP
 		s.put(STORE_IS_WHOLE_WORD, fIsWholeWord);
 		s.put(STORE_SEARCH_DERIVED, fSearchDerived);
 		s.put(STORE_SEARCH_IN_BINARIES, fSearchBinaries);
+		s.put(STORE_SEARCH_IN_ARCHIVES, fSearchArchives);
 
 		int historySize= Math.min(fPreviousSearchPatterns.size(), HISTORY_SIZE);
 		s.put(STORE_HISTORY_SIZE, historySize);
