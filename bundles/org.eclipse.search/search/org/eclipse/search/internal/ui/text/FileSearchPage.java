@@ -272,6 +272,11 @@ public class FileSearchPage extends AbstractTextSearchViewPage implements IAdapt
 		if (resource == null || resource.getLocationURI() == null) {
 			return resource;
 		}
+
+		if (resource.getLocationURI().getScheme().equals("zip")) { //$NON-NLS-1$
+			return resource;
+		}
+
 		ITextFileBufferManager textFileBufferManager = FileBuffers.getTextFileBufferManager();
 		ITextFileBuffer textFileBuffer = textFileBufferManager.getTextFileBuffer(resource.getFullPath(),
 				LocationKind.IFILE);
