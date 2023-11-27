@@ -17,8 +17,6 @@ package org.eclipse.ui.wizards.datatransfer;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -554,21 +552,6 @@ public class ImportOperation extends WorkspaceModifyOperation {
 					targetResource.setContents(contentStream, IResource.KEEP_HISTORY, subMonitor.split(100));
 			} else
 				targetResource.create(contentStream, false, subMonitor.split(100));
-			if (targetPath.getFileExtension().equals("zip") || targetPath.getFileExtension().equals("jar")) { //$NON-NLS-1$ //$NON-NLS-2$
-				URI zipURI;
-				try {
-					if (!targetResource.isLinked()) {
-						zipURI = new URI("zip", null, "/", targetResource.getLocationURI().toString(), null); //$NON-NLS-1$ //$NON-NLS-2$
-				} else {
-					zipURI = targetResource.getLocationURI();
-				}
-				IFolder link = targetResource.getParent().getFolder(IPath.fromOSString(targetResource.getName()));
-				link.createLink(zipURI, IResource.REPLACE, null);
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			}
 			setResourceAttributes(targetResource, fileObject);
 
 			if (provider instanceof TarLeveledStructureProvider) {
