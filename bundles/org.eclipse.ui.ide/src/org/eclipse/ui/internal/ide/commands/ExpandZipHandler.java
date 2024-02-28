@@ -16,32 +16,15 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.commands;
 
-import java.net.URI;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 public class ExpandZipHandler extends AbstractHandler {
-
-	public void expandZip(IFile file, Shell shell) {
-		try {
-			URI zipURI = new URI("zip", null, "/", file.getLocationURI().toString(), null); //$NON-NLS-1$ //$NON-NLS-2$
-			IFolder link = file.getParent().getFolder(IPath.fromOSString(file.getName()));
-			link.createLink(zipURI, IResource.REPLACE, null);
-		} catch (Exception e) {
-			MessageDialog.openError(shell, "Error", "Error opening zip file"); //$NON-NLS-1$ //$NON-NLS-2$
-			e.printStackTrace();
-		}
-	}
 
 	@Override
 	public Object execute(ExecutionEvent event) {
@@ -58,7 +41,7 @@ public class ExpandZipHandler extends AbstractHandler {
 			return null;
 		}
 
-		expandZip((IFile) element, shell);
+		ZipExpander.expandZip((IFile) element, shell);
 		return null;
 	}
 
