@@ -16,6 +16,15 @@
  *******************************************************************************/
 package org.eclipse.ui.navigator;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.PerformanceStats;
 import org.eclipse.core.runtime.SafeRunner;
@@ -26,6 +35,8 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
@@ -533,13 +544,40 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 	 *            Supplied by the DoubleClick listener.
 	 */
 	protected void handleDoubleClick(DoubleClickEvent anEvent) {
-
-		IAction openHandler = getViewSite().getActionBars().getGlobalActionHandler(ICommonActionConstants.OPEN);
+		IStructuredSelection selection = (IStructuredSelection) anEvent.getSelection();
+		TreeSelection treeSelection = (TreeSelection) selection;
+		TreePath paths[] = treeSelection.getPaths();
+		Object lastSegment = paths[paths.length - 1].getLastSegment();
+		IFile file = null;
+		IFolder link = null;
+		boolean isArchive = false;
+		if (lastSegment instanceof IAdaptable fileSegment) {
+			file = fileSegment.getAdapter(IFile.class);
+			isArchive = file != null
+					&& (file.getFileExtension().equals("zip") || file.getFileExtension().equals("jar")); //$NON-NLS-1$ //$NON-NLS-2$
+			if (isArchive) {
+				try {
+					URI zipURI = new URI("zip", null, "/", file.getLocationURI().toString(), null); //$NON-NLS-1$ //$NON-NLS-2$
+					link = file.getParent().getFolder(IPath.fromOSString(file.getName()));
+					link.createLink(zipURI, IResource.REPLACE, null);
+					link.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
+				} catch (URISyntaxException | CoreException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		IAction openHandler = null;
+		if (!isArchive) {
+			openHandler = getViewSite().getActionBars().getGlobalActionHandler(ICommonActionConstants.OPEN);
+		}
 
 		if(openHandler == null) {
-			IStructuredSelection selection = (IStructuredSelection) anEvent
-					.getSelection();
-			Object element = selection.getFirstElement();
+			Object element;
+			if (isArchive) {
+				element = link;
+			} else {
+				element = selection.getFirstElement();
+			}
 
 			TreeViewer viewer = getCommonViewer();
 			if (viewer.isExpandable(element)) {
