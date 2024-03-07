@@ -2855,7 +2855,7 @@
    <extension
          point="org.eclipse.ui.ide.filesystemSupport">
       <filesystemContributor
-            class="org.eclipse.ui.ide.fileSystem.ZipFileSystemContributor"
+            class="org.eclipse.ui.ide.fileSystem.zip.ZipFileSystemContributor"
             label="%filesystem.file.zip"
             scheme="zip"/>
    </extension>
