@@ -1099,22 +1099,7 @@
           id="org.eclipse.ui.internal.ide.commands.collapseZip"
           name="%command.collapseZip.name"
           defaultHandler="org.eclipse.ui.internal.ide.commands.CollapseZipHandler">
-    </command>
-    <command
-          id="org.eclipse.ui.internal.ide.commands.includeResource"
-          name="%command.includeResource.name"
-          defaultHandler="org.eclipse.ui.internal.ide.commands.IncludeResourceHandler">
-    </command>
-    <command
-          id="org.eclipse.ui.internal.ide.commands.excludeResource"
-          name="%command.excludeResource.name"
-          defaultHandler="org.eclipse.ui.internal.ide.commands.ExcludeResourceHandler">
-    </command>
-    <command
-          id="org.eclipse.ui.internal.ide.commands.createdNested"
-          name="%command.createNestedProjects.name"
-          defaultHandler="org.eclipse.ui.internal.ide.commands.CreatedNestedProjectsHandler">
-    </command>         
+    </command>       
    </extension>
    
    <extension
@@ -2692,57 +2677,6 @@
                          </test>
                       </or>
                    </adapt>
-                </iterate>
-             </with>
-          </visibleWhen>
-       </command>
-       <command
-             commandId="org.eclipse.ui.internal.ide.commands.includeResource"
-             label="%command.includeResource.name"
-             style="push">
-          <visibleWhen
-                checkEnabled="false">
-             <with
-                   variable="activeMenuSelection">
-                <iterate
-                      ifEmpty="false">
-                   <instanceof
-                         value="org.eclipse.core.resources.IResource">
-                   </instanceof>
-                </iterate>
-             </with>
-          </visibleWhen>
-       </command>
-       <command
-             commandId="org.eclipse.ui.internal.ide.commands.excludeResource"
-             label="%command.excludeResource.name"
-             style="push">
-          <visibleWhen
-                checkEnabled="false">
-             <with
-                   variable="activeMenuSelection">
-                <iterate
-                      ifEmpty="false">
-                   <instanceof
-                         value="org.eclipse.core.resources.IResource">
-                   </instanceof>
-                </iterate>
-             </with>
-          </visibleWhen>
-       </command>
-       <command
-             commandId="org.eclipse.ui.internal.ide.commands.createdNested"
-             label="%command.createNestedProjects.name"
-             style="push">
-          <visibleWhen
-                checkEnabled="false">
-             <with
-                   variable="activeMenuSelection">
-                <iterate
-                      ifEmpty="false">
-                   <instanceof
-                         value="org.eclipse.core.resources.IProject">
-                   </instanceof>
                 </iterate>
              </with>
           </visibleWhen>
