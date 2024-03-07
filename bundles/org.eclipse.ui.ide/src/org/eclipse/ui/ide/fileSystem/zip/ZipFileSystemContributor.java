@@ -12,7 +12,7 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ui.ide.fileSystem;
+package org.eclipse.ui.ide.fileSystem.zip;
 
 import java.io.File;
 import java.net.URI;
@@ -20,6 +20,7 @@ import java.net.URISyntaxException;
 
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.ide.fileSystem.FileSystemContributor;
 
 /**
  * ZipFileSystemContributor is the zip example of a file system contributor.
