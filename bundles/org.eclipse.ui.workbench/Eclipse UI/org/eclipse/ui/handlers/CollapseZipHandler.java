@@ -14,16 +14,19 @@
  *                       in order to be used with the 'org.eclipse.ui.menus'
  *                       extension point.
  *******************************************************************************/
-package org.eclipse.ui.internal.ide.commands;
+package org.eclipse.ui.handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.handlers.HandlerUtil;
 
+/**
+ * @since 3.132
+ */
 public class CollapseZipHandler extends AbstractHandler {
 
 	@Override
@@ -40,8 +43,12 @@ public class CollapseZipHandler extends AbstractHandler {
 		if (!(element instanceof IFolder)) {
 			return null;
 		}
-
-		ZipCollapser.collapseZip((IFolder) element, shell);
+		try {
+			ZipCollapser.collapseZip((IFolder) element);
+		} catch (Exception e) {
+			MessageDialog.openError(shell, "Error", "Error opening zip file"); //$NON-NLS-1$ //$NON-NLS-2$
+			e.printStackTrace();
+		}
 		return null;
 	}
 
