@@ -19,11 +19,19 @@
 
 package org.eclipse.jface.viewers;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.jface.viewers.internal.ExpandableNode;
 import org.eclipse.pde.api.tools.annotations.NoExtend;
@@ -1114,6 +1122,26 @@ public class TreeViewer extends AbstractTreeViewer {
 			}
 		} else {
 			super.editElement(element, column);
+		}
+	}
+
+	@Override
+	void expandNode(Widget w) {
+		Object selectedItem = w.getData();
+		if (selectedItem instanceof IAdaptable fileItem) {
+			IFile file = fileItem.getAdapter(IFile.class);
+			try {
+				URI zipURI = new URI("zip", null, "/", file.getLocationURI().toString(), null); //$NON-NLS-1$ //$NON-NLS-2$
+				IFolder link = file.getParent().getFolder(IPath.fromOSString(file.getName()));
+				link.createLink(zipURI, IResource.REPLACE, null);
+				link.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
+				if (this.isExpandable(link)) {
+					this.setExpandedState(link, !this.getExpandedState(link));
+					}
+					return;
+				} catch (URISyntaxException | CoreException e) {
+					e.printStackTrace();
+			}
 		}
 	}
 

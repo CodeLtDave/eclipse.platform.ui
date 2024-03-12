@@ -887,6 +887,11 @@ public abstract class ColumnViewer extends StructuredViewer {
 		// populate remaining elements.
 	}
 
+	void expandNode(Widget cell) {
+		// default implementation does nothing. Actual viewers can decide how to
+		// populate remaining elements.
+	}
+
 	/**
 	 * If the items limit is not set, or the number of visible children is below the
 	 * items limit, this method does nothing and returns {@code null}.

@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
@@ -1511,6 +1512,14 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 */
 	@Override
 	protected void handleDoubleSelect(SelectionEvent event) {
+		Widget selectedItem = event.item;
+		if (selectedItem.getData() instanceof IResource item) {
+			if (item.getFileExtension().equals("zip") || item.getFileExtension().equals("jar")) { //$NON-NLS-1$ //$NON-NLS-2$
+				expandNode(selectedItem);
+				return;
+			}
+		}
+
 		// expand ExpandableNode for default selection.
 		if (event.item != null && event.item.getData() instanceof ExpandableNode) {
 			handleExpandableNodeClicked(event.item);
