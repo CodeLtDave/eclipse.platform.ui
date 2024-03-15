@@ -19,7 +19,6 @@
 
 package org.eclipse.jface.viewers;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -28,7 +27,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ZipExpander;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
@@ -1131,10 +1130,8 @@ public class TreeViewer extends AbstractTreeViewer {
 		if (selectedItem instanceof IAdaptable fileItem) {
 			IFile file = fileItem.getAdapter(IFile.class);
 			try {
-				URI zipURI = new URI("zip", null, "/", file.getLocationURI().toString(), null); //$NON-NLS-1$ //$NON-NLS-2$
+				ZipExpander.expandZip(file);
 				IFolder link = file.getParent().getFolder(IPath.fromOSString(file.getName()));
-				link.createLink(zipURI, IResource.REPLACE, null);
-				link.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
 				if (this.isExpandable(link)) {
 					this.setExpandedState(link, !this.getExpandedState(link));
 					}
