@@ -16,10 +16,13 @@
  *******************************************************************************/
 package org.eclipse.ui.handlers;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ZipExpander;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -46,11 +49,10 @@ public class ExpandZipHandler extends AbstractHandler {
 		}
 		try {
 			ZipExpander.expandZip((IFile) element);
-		} catch (Exception e) {
-			MessageDialog.openError(shell, "Error", "Error opening zip file"); //$NON-NLS-1$ //$NON-NLS-2$
+		} catch (URISyntaxException | CoreException | IOException e) {
+			MessageDialog.openError(shell, "Error", e.getMessage()); //$NON-NLS-1$
 			e.printStackTrace();
 		}
 		return null;
 	}
-
 }
