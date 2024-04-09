@@ -16,7 +16,6 @@
  *******************************************************************************/
 package org.eclipse.ui.navigator;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 
 import org.eclipse.core.resources.IFile;
@@ -557,7 +556,7 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 			if (isArchive) {
 				try {
 					ZipExpander.expandZip(file);
-				} catch (URISyntaxException | CoreException | IOException e) {
+				} catch (URISyntaxException | CoreException e) {
 					e.printStackTrace();
 				}
 			}
