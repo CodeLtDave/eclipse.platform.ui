@@ -16,13 +16,15 @@
  *******************************************************************************/
 package org.eclipse.ui.navigator;
 
+import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.ZipExpander;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.PerformanceStats;
 import org.eclipse.core.runtime.SafeRunner;
@@ -555,7 +557,10 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 					&& (file.getFileExtension().equals("zip") || file.getFileExtension().equals("jar")); //$NON-NLS-1$ //$NON-NLS-2$
 			if (isArchive) {
 				try {
-					ZipExpander.expandZip(file);
+					URI zipURI = new URI("zip", null, "/", file.getLocationURI().toString(), null); //$NON-NLS-1$ //$NON-NLS-2$
+					link = file.getParent().getFolder(IPath.fromOSString(file.getName()));
+					link.createLink(zipURI, IResource.REPLACE, null);
+					link.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
 				} catch (URISyntaxException | CoreException e) {
 					e.printStackTrace();
 				}
