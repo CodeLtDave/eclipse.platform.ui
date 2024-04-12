@@ -84,6 +84,11 @@
 	                         </test>
 	                      </or>
 	                   </adapt>
+	                   <not>
+                           <test 
+                                	property="org.eclipse.core.resources.linked"
+                                 	value="true"/>
+                            </not>
 	                </iterate>
 	             </with>
 	          </visibleWhen>
