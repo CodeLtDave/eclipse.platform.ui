@@ -50,8 +50,13 @@ public class ExpandZipHandler extends AbstractHandler {
 		try {
 			ZipExpander.expandZip((IFile) element);
 		} catch (URISyntaxException | CoreException | IOException e) {
-			MessageDialog.openError(shell, "Error", e.getMessage()); //$NON-NLS-1$
-			e.printStackTrace();
+			if (e.getMessage().contains("unsupported compression method")) { //$NON-NLS-1$
+				MessageDialog.openError(shell, "Error", //$NON-NLS-1$
+						"The archive cannot be expanded because it was compressed with an unsupported compression method."); //$NON-NLS-1$
+			} else {
+				MessageDialog.openError(shell, "Error", "Error opening zip file"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
 		}
 		return null;
 	}
