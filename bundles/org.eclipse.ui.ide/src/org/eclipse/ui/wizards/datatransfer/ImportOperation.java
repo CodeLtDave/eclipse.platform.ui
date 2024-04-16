@@ -544,6 +544,13 @@ public class ImportOperation extends WorkspaceModifyOperation {
 				targetResource.createLink(
 						createRelativePath(IPath.fromOSString(provider.getFullPath(fileObject)), targetResource), 0,
 						subMonitor.split(50));
+			} else if (targetResource.getFileExtension().equals("zip") //$NON-NLS-1$
+					|| targetResource.getFileExtension().equals("jar")) { //$NON-NLS-1$
+				IFolder expandedArchive = targetResource.getProject().getFolder(targetResource.getName());
+				if (expandedArchive.exists()) {
+					expandedArchive.delete(true, subMonitor.split(50));
+				}
+				targetResource.create(contentStream, false, subMonitor.split(50));
 			} else if (targetResource.exists()) {
 				if (targetResource.isLinked()) {
 					targetResource.delete(true, subMonitor.split(50));
