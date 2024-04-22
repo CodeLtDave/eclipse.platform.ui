@@ -192,7 +192,7 @@ public class TextSearchVisitor {
 			monitor.setTaskName(file.getFullPath().toString());
 			boolean isInArchive = false;
 
-			if (file.getLocationURI().getScheme().equals("zip")) { //$NON-NLS-1$
+			if (file.getLocationURI().getScheme().equals("zip") || file.getLocationURI().getScheme().equals("jar")) { //$NON-NLS-1$ //$NON-NLS-2$
 				isInArchive = true;
 			}
 

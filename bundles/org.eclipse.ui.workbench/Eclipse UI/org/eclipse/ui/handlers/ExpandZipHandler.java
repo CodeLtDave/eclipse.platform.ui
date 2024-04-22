@@ -16,7 +16,6 @@
  *******************************************************************************/
 package org.eclipse.ui.handlers;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -49,7 +48,7 @@ public class ExpandZipHandler extends AbstractHandler {
 		}
 		try {
 			ZipExpander.expandZip((IFile) element);
-		} catch (URISyntaxException | CoreException | IOException e) {
+		} catch (URISyntaxException | CoreException e) {
 			if (e.getMessage().contains("unsupported compression method")) { //$NON-NLS-1$
 				MessageDialog.openError(shell, "Error", //$NON-NLS-1$
 						"The archive cannot be expanded because it was compressed with an unsupported compression method."); //$NON-NLS-1$

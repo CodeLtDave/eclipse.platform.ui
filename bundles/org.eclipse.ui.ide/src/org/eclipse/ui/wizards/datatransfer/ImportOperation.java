@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 
 import org.eclipse.core.filesystem.URIUtil;
+import org.eclipse.core.filesystem.zip.ZipFileUtil;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -544,8 +545,7 @@ public class ImportOperation extends WorkspaceModifyOperation {
 				targetResource.createLink(
 						createRelativePath(IPath.fromOSString(provider.getFullPath(fileObject)), targetResource), 0,
 						subMonitor.split(50));
-			} else if (targetResource.getFileExtension().equals("zip") //$NON-NLS-1$
-					|| targetResource.getFileExtension().equals("jar")) { //$NON-NLS-1$
+			} else if (ZipFileUtil.isArchive(targetResource.getFullPath())) { // $NON-NLS-1$
 				IFolder expandedArchive = targetResource.getProject().getFolder(targetResource.getName());
 				if (expandedArchive.exists()) {
 					expandedArchive.delete(true, subMonitor.split(50));

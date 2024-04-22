@@ -25,14 +25,26 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Item;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.Tree;
+
+import org.eclipse.core.filesystem.zip.ZipFileUtil;
+
+import org.eclipse.core.runtime.IAdaptable;
+
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+
 import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBuffer;
 import org.eclipse.core.filebuffers.ITextFileBufferManager;
 import org.eclipse.core.filebuffers.LocationKind;
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IAdaptable;
+
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.ErrorDialog;
@@ -50,21 +62,7 @@ import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.search.internal.ui.Messages;
-import org.eclipse.search.internal.ui.SearchMessages;
-import org.eclipse.search.ui.IContextMenuConstants;
-import org.eclipse.search.ui.ISearchResultViewPart;
-import org.eclipse.search.ui.NewSearchUI;
-import org.eclipse.search.ui.text.AbstractTextSearchResult;
-import org.eclipse.search.ui.text.AbstractTextSearchViewPage;
-import org.eclipse.search.ui.text.Match;
-import org.eclipse.search2.internal.ui.OpenSearchPreferencesAction;
-import org.eclipse.swt.dnd.DND;
-import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Item;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.Tree;
+
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IWorkbenchPage;
@@ -76,6 +74,17 @@ import org.eclipse.ui.part.IShowInSource;
 import org.eclipse.ui.part.IShowInTargetList;
 import org.eclipse.ui.part.ResourceTransfer;
 import org.eclipse.ui.part.ShowInContext;
+
+import org.eclipse.search.internal.ui.Messages;
+import org.eclipse.search.internal.ui.SearchMessages;
+import org.eclipse.search.ui.IContextMenuConstants;
+import org.eclipse.search.ui.ISearchResultViewPart;
+import org.eclipse.search.ui.NewSearchUI;
+import org.eclipse.search.ui.text.AbstractTextSearchResult;
+import org.eclipse.search.ui.text.AbstractTextSearchViewPage;
+import org.eclipse.search.ui.text.Match;
+
+import org.eclipse.search2.internal.ui.OpenSearchPreferencesAction;
 
 
 public class FileSearchPage extends AbstractTextSearchViewPage implements IAdaptable {
@@ -273,7 +282,7 @@ public class FileSearchPage extends AbstractTextSearchViewPage implements IAdapt
 			return resource;
 		}
 
-		if (resource.getLocationURI().getScheme().equals("zip")) { //$NON-NLS-1$
+		if (ZipFileUtil.isArchive(resource.getFullPath())) { // $NON-NLS-1$
 			return resource;
 		}
 
