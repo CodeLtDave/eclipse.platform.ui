@@ -377,7 +377,7 @@ public class ViewerItemsLimitTest extends UITestCase {
 
 		SearchView searchView = (SearchView) activePage.showView(SEARCH_VIEW_ID);
 		FileTextSearchScope scope = FileTextSearchScope.newWorkspaceScope(new String[] { "*" }, false);
-		FileSearchQuery searchQuery = new FileSearchQuery("some", false, false, false, false, scope);
+		FileSearchQuery searchQuery = new FileSearchQuery("some", false, false, false, false, scope, false);
 		NewSearchUI.runQueryInBackground(searchQuery);
 
 		// job may take some time to create marker.

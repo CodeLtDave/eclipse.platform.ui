@@ -100,7 +100,7 @@ public abstract class TextSearchQueryProvider {
 		 * override.
 		 *
 		 * @return <code>true</code> if archive files are searched
-		 * @since 3.16
+		 * @since 3.17
 		 */
 		public boolean searchInArchives() {
 			return false;
