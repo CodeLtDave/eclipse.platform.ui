@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 
 import org.eclipse.core.filesystem.URIUtil;
-import org.eclipse.core.filesystem.zip.ZipFileUtil;
+import org.eclipse.core.filesystem.ZipFileUtil;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;

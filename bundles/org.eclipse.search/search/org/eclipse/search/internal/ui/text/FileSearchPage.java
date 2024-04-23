@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Tree;
 
-import org.eclipse.core.filesystem.zip.ZipFileUtil;
+import org.eclipse.core.filesystem.ZipFileUtil;
 
 import org.eclipse.core.runtime.IAdaptable;
 
