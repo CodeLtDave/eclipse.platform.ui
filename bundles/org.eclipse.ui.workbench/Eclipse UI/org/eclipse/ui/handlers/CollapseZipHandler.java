@@ -19,7 +19,7 @@ package org.eclipse.ui.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.ZipCollapser;
+import org.eclipse.core.resources.ZipTransformer;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -45,7 +45,7 @@ public class CollapseZipHandler extends AbstractHandler {
 			return null;
 		}
 		try {
-			ZipCollapser.collapseZip((IFolder) element);
+			ZipTransformer.collapseZip((IFolder) element);
 		} catch (Exception e) {
 			MessageDialog.openError(shell, "Error", "Error opening zip file"); //$NON-NLS-1$ //$NON-NLS-2$
 			e.printStackTrace();

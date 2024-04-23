@@ -20,7 +20,7 @@ import java.net.URISyntaxException;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.ZipExpander;
+import org.eclipse.core.resources.ZipTransformer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
@@ -47,7 +47,7 @@ public class ExpandZipHandler extends AbstractHandler {
 			return null;
 		}
 		try {
-			ZipExpander.expandZip((IFile) element);
+			ZipTransformer.expandZip((IFile) element);
 		} catch (URISyntaxException | CoreException e) {
 			if (e.getMessage().contains("unsupported compression method")) { //$NON-NLS-1$
 				MessageDialog.openError(shell, "Error", //$NON-NLS-1$
