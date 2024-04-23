@@ -16,25 +16,27 @@
  *******************************************************************************/
 package org.eclipse.ui.handlers;
 
+import java.net.URISyntaxException;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.ZipTransformer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ArchiveTransformer;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * This class represents a handler for collapsing an expanded archive folder.
+ * This class represents a handler for expanding archive files.
  *
  * @since 3.132
  */
-public class CollapseZipHandler extends AbstractHandler {
+public class ExpandArchiveHandler extends AbstractHandler {
 
 	/**
-	 * Executes the handler action, which involves collapsing an expanded archive
-	 * folder into an archive file.
+	 * Executes the handler action, which involves expanding an archive file
+	 * selected by the user.
 	 * 
 	 * @param event The event triggering the execution of this handler.
 	 */
@@ -49,14 +51,13 @@ public class CollapseZipHandler extends AbstractHandler {
 
 		Object element = ((IStructuredSelection) selection).getFirstElement();
 
-		if (!(element instanceof IFolder)) {
+		if (!(element instanceof IFile)) {
 			return null;
 		}
 		try {
-			ZipTransformer.collapseZip((IFolder) element);
-		} catch (Exception e) {
-			MessageDialog.openError(shell, "Error", "Error opening zip file"); //$NON-NLS-1$ //$NON-NLS-2$
-			e.printStackTrace();
+			ArchiveTransformer.expandArchive((IFile) element);
+		} catch (URISyntaxException | CoreException e) {
+			MessageDialog.openError(shell, "Error opening zip file", e.getMessage()); //$NON-NLS-1$
 		}
 		return null;
 	}

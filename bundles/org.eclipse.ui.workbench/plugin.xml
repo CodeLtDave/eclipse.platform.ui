@@ -48,12 +48,12 @@
 	   <command
 	          id="org.eclipse.ui.internal.ide.commands.expandZip"
 	          name="%command.name.expandZip"
-	          defaultHandler="org.eclipse.ui.handlers.ExpandZipHandler">
+	          defaultHandler="org.eclipse.ui.handlers.ExpandArchiveHandler">
 	    </command>
 	    <command
 	          id="org.eclipse.ui.internal.ide.commands.collapseZip"
 	          name="%command.name.collapseZip"
-	          defaultHandler="org.eclipse.ui.handlers.CollapseZipHandler">
+	          defaultHandler="org.eclipse.ui.handlers.CollapseArchiveHandler">
 	    </command>  
    </extension>
    <extension
