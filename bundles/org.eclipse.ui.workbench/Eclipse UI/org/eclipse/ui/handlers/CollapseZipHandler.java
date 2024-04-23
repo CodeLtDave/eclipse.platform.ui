@@ -26,10 +26,18 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 
 /**
+ * This class represents a handler for collapsing an expanded archive folder.
+ *
  * @since 3.132
  */
 public class CollapseZipHandler extends AbstractHandler {
 
+	/**
+	 * Executes the handler action, which involves collapsing an expanded archive
+	 * folder into an archive file.
+	 * 
+	 * @param event The event triggering the execution of this handler.
+	 */
 	@Override
 	public Object execute(ExecutionEvent event) {
 		Shell shell = HandlerUtil.getActiveShell(event);
@@ -52,5 +60,4 @@ public class CollapseZipHandler extends AbstractHandler {
 		}
 		return null;
 	}
-
 }

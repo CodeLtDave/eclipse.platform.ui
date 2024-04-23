@@ -28,10 +28,18 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 
 /**
+ * This class represents a handler for expanding archive files.
+ *
  * @since 3.132
  */
 public class ExpandZipHandler extends AbstractHandler {
 
+	/**
+	 * Executes the handler action, which involves expanding an archive file
+	 * selected by the user.
+	 * 
+	 * @param event The event triggering the execution of this handler.
+	 */
 	@Override
 	public Object execute(ExecutionEvent event) {
 		Shell shell = HandlerUtil.getActiveShell(event);
