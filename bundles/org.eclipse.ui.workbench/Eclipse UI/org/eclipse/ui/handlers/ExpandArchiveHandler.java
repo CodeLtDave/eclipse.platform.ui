@@ -16,13 +16,17 @@
  *******************************************************************************/
 package org.eclipse.ui.handlers;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ArchiveTransformer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
@@ -37,14 +41,14 @@ public class ExpandArchiveHandler extends AbstractHandler {
 	/**
 	 * Executes the handler action, which involves expanding an archive file
 	 * selected by the user.
-	 * 
+	 *
 	 * @param event The event triggering the execution of this handler.
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) {
 		Shell shell = HandlerUtil.getActiveShell(event);
+		ProgressMonitorDialog dialog = new ProgressMonitorDialog(shell);
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
-
 		if (!(selection instanceof IStructuredSelection)) {
 			return null;
 		}
@@ -54,11 +58,24 @@ public class ExpandArchiveHandler extends AbstractHandler {
 		if (!(element instanceof IFile)) {
 			return null;
 		}
-		try {
-			ArchiveTransformer.expandArchive((IFile) element);
-		} catch (URISyntaxException | CoreException e) {
-			MessageDialog.openError(shell, "Error opening zip file", e.getMessage()); //$NON-NLS-1$
-		}
+			try {
+				dialog.run(true, true, new IRunnableWithProgress() {
+					@Override
+					public void run(IProgressMonitor monitor) throws InterruptedException {
+						monitor.beginTask("Expanding Archive File", 5); //$NON-NLS-1$
+						try {
+							ArchiveTransformer.expandArchive((IFile) element, monitor);
+						} catch (URISyntaxException | CoreException e) {
+							throw new InterruptedException(e.getMessage());
+						}
+						monitor.worked(1);
+					}
+				});
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				MessageDialog.openError(shell, "Error opening zip file", e.getMessage()); //$NON-NLS-1$
+			}
 		return null;
 	}
 }
