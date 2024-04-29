@@ -46,13 +46,13 @@
    <extension
          point="org.eclipse.ui.commands">
 	   <command
-	          id="org.eclipse.ui.internal.ide.commands.expandZip"
-	          name="%command.name.expandZip"
+	          id="org.eclipse.ui.commands.expandZip"
+	          name="%command.name.expandArchive"
 	          defaultHandler="org.eclipse.ui.handlers.ExpandArchiveHandler">
 	    </command>
 	    <command
-	          id="org.eclipse.ui.internal.ide.commands.collapseZip"
-	          name="%command.name.collapseZip"
+	          id="org.eclipse.ui.commands.collapseZip"
+	          name="%command.name.expandArchive"
 	          defaultHandler="org.eclipse.ui.handlers.CollapseArchiveHandler">
 	    </command>  
    </extension>
@@ -62,8 +62,8 @@
 	          allPopups="false"
 	          locationURI="popup:org.eclipse.ui.popup.any?after=additions">
 	       <command
-	             commandId="org.eclipse.ui.internal.ide.commands.expandZip"
-	             label="%command.name.expandZip"
+	             commandId="org.eclipse.ui.commands.expandZip"
+	             label="%command.name.expandArchive"
 	             style="push">
 	          <visibleWhen
 	                checkEnabled="false">
@@ -78,10 +78,6 @@
 	                               property="org.eclipse.core.resources.extension"
 	                               value="zip">
 	                         </test>
-	                         <test
-	                               property="org.eclipse.core.resources.extension"
-	                               value="jar">
-	                         </test>
 	                      </or>
 	                   </adapt>
 	                   <not>
@@ -94,8 +90,8 @@
 	          </visibleWhen>
 	       </command>
 	       <command
-	             commandId="org.eclipse.ui.internal.ide.commands.collapseZip"
-	             label="%command.name.collapseZip"
+	             commandId="org.eclipse.ui.commands.collapseZip"
+	             label="%command.name.collapseArchive"
 	             style="push">
 	          <visibleWhen
 	                checkEnabled="false">
@@ -109,10 +105,6 @@
 	                         <test
 	                               property="org.eclipse.core.resources.extension"
 	                               value="zip">
-	                         </test>
-	                         <test
-	                               property="org.eclipse.core.resources.extension"
-	                               value="jar">
 	                         </test>
 	                      </or>
 	                   </adapt>
