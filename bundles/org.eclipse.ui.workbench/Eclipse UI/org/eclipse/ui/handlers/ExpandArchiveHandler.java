@@ -20,8 +20,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.resources.ArchiveTransformer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ZipFileTransformer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -64,7 +64,7 @@ public class ExpandArchiveHandler extends AbstractHandler {
 					public void run(IProgressMonitor monitor) throws InterruptedException {
 						monitor.beginTask("Expanding Archive File", 5); //$NON-NLS-1$
 						try {
-							ArchiveTransformer.expandArchive((IFile) element, monitor);
+							ZipFileTransformer.openZipFile((IFile) element, monitor);
 						} catch (URISyntaxException | CoreException e) {
 							throw new InterruptedException(e.getMessage());
 						}

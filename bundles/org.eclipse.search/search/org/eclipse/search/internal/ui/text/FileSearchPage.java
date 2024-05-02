@@ -282,7 +282,7 @@ public class FileSearchPage extends AbstractTextSearchViewPage implements IAdapt
 			return resource;
 		}
 
-		if (ZipFileUtil.isArchive(resource.getFullPath())) { // $NON-NLS-1$
+		if (ZipFileUtil.isInsideOpenZipFile(resource.getLocationURI())) { // $NON-NLS-1$
 			return resource;
 		}
 

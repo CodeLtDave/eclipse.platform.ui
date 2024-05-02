@@ -19,7 +19,7 @@ package org.eclipse.ui.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.ArchiveTransformer;
+import org.eclipse.core.resources.ZipFileTransformer;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -35,7 +35,7 @@ public class CollapseArchiveHandler extends AbstractHandler {
 	/**
 	 * Executes the handler action, which involves collapsing an expanded archive
 	 * folder into an archive file.
-	 * 
+	 *
 	 * @param event The event triggering the execution of this handler.
 	 */
 	@Override
@@ -53,7 +53,7 @@ public class CollapseArchiveHandler extends AbstractHandler {
 			return null;
 		}
 		try {
-			ArchiveTransformer.collapseArchive((IFolder) element);
+			ZipFileTransformer.closeZipFile((IFolder) element);
 		} catch (Exception e) {
 			MessageDialog.openError(shell, "Error", "Error opening zip file"); //$NON-NLS-1$ //$NON-NLS-2$
 			e.printStackTrace();

@@ -545,7 +545,7 @@ public class ImportOperation extends WorkspaceModifyOperation {
 				targetResource.createLink(
 						createRelativePath(IPath.fromOSString(provider.getFullPath(fileObject)), targetResource), 0,
 						subMonitor.split(50));
-			} else if (ZipFileUtil.isArchive(targetResource.getFullPath())) { // $NON-NLS-1$
+			} else if (ZipFileUtil.isInsideOpenZipFile(targetResource.getLocationURI())) { // $NON-NLS-1$
 				IFolder expandedArchive = targetResource.getProject().getFolder(targetResource.getName());
 				if (expandedArchive.exists()) {
 					expandedArchive.delete(true, subMonitor.split(50));
