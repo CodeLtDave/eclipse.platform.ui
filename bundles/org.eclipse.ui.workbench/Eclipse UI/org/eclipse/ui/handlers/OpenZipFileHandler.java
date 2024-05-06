@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Shell;
  *
  * @since 3.132
  */
-public class ExpandArchiveHandler extends AbstractHandler {
+public class OpenZipFileHandler extends AbstractHandler {
 
 	/**
 	 * Executes the handler action, which involves expanding an archive file

@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Shell;
  *
  * @since 3.132
  */
-public class CollapseArchiveHandler extends AbstractHandler {
+public class CloseZipFileHandler extends AbstractHandler {
 
 	/**
 	 * Executes the handler action, which involves collapsing an expanded archive
