@@ -59,7 +59,7 @@ public class OpenZipFileHandler extends AbstractHandler {
 			return null;
 		}
 			try {
-				dialog.run(true, true, new IRunnableWithProgress() {
+				dialog.run(true, false, new IRunnableWithProgress() {
 					@Override
 					public void run(IProgressMonitor monitor) throws InterruptedException {
 						monitor.beginTask("Opening Zip File", 5); //$NON-NLS-1$
