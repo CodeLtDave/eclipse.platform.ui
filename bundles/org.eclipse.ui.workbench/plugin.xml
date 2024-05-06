@@ -46,13 +46,13 @@
    <extension
          point="org.eclipse.ui.commands">
 	   <command
-	          id="org.eclipse.ui.commands.expandArchive"
-	          name="%command.name.expandArchive"
+	          id="org.eclipse.ui.commands.openZipFile"
+	          name="%command.name.openZipFile"
 	          defaultHandler="org.eclipse.ui.handlers.OpenZipFileHandler">
 	    </command>
 	    <command
-	          id="org.eclipse.ui.commands.collapseArchive"
-	          name="%command.name.collapseArchive"
+	          id="org.eclipse.ui.commands.closeZipFile"
+	          name="%command.name.closeZipFile"
 	          defaultHandler="org.eclipse.ui.handlers.CloseZipFileHandler">
 	    </command>  
    </extension>
@@ -62,8 +62,8 @@
 	          allPopups="false"
 	          locationURI="popup:org.eclipse.ui.popup.any?after=additions">
 	       <command
-	             commandId="org.eclipse.ui.commands.expandArchive"
-	             label="%command.name.expandArchive"
+	             commandId="org.eclipse.ui.commands.openZipFile"
+	             label="%command.name.openZipFile"
 	             style="push">
 	          <visibleWhen
 	                checkEnabled="false">
@@ -89,8 +89,8 @@
 	          </visibleWhen>
 	       </command>
 	       <command
-	             commandId="org.eclipse.ui.commands.collapseArchive"
-	             label="%command.name.collapseArchive"
+	             commandId="org.eclipse.ui.commands.closeZipFile"
+	             label="%command.name.closeZipFile"
 	             style="push">
 	          <visibleWhen
 	                checkEnabled="false">

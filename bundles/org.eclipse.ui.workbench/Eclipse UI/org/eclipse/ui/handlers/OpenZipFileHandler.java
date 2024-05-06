@@ -32,15 +32,15 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * This class represents a handler for expanding archive files.
+ * This class represents a handler for opening zip files.
  *
  * @since 3.132
  */
 public class OpenZipFileHandler extends AbstractHandler {
 
 	/**
-	 * Executes the handler action, which involves expanding an archive file
-	 * selected by the user.
+	 * Executes the handler action, which involves opening a zip file selected by
+	 * the user.
 	 *
 	 * @param event The event triggering the execution of this handler.
 	 */
@@ -62,7 +62,7 @@ public class OpenZipFileHandler extends AbstractHandler {
 				dialog.run(true, true, new IRunnableWithProgress() {
 					@Override
 					public void run(IProgressMonitor monitor) throws InterruptedException {
-						monitor.beginTask("Expanding Archive File", 5); //$NON-NLS-1$
+						monitor.beginTask("Opening Zip File", 5); //$NON-NLS-1$
 						try {
 							ZipFileTransformer.openZipFile((IFile) element, monitor);
 						} catch (URISyntaxException | CoreException e) {
