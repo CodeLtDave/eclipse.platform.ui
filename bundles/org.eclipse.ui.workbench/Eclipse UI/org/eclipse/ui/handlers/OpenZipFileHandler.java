@@ -60,7 +60,7 @@ public class OpenZipFileHandler extends AbstractHandler {
 					public void run(IProgressMonitor monitor) throws InterruptedException {
 						monitor.beginTask("Opening Zip File", 5); //$NON-NLS-1$
 						try {
-							ZipFileTransformer.openZipFile((IFile) element, monitor);
+							ZipFileTransformer.openZipFile((IFile) element, monitor, false);
 						} catch (URISyntaxException | CoreException e) {
 							throw new InterruptedException(e.getMessage());
 						}
