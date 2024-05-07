@@ -1,19 +1,15 @@
 /*******************************************************************************
- * Copyright (c) 2022 IBM Corporation and others.
+ * Copyright (c) 2024 Vector Informatik GmbH and others.
  *
- * This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License 2.0
- * which accompanies this distribution, and is available at
+ * This program and the accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *     Patrick Ziegler - Migration from a JFace Action to a Command Handler,
- *                       in order to be used with the 'org.eclipse.ui.menus'
- *                       extension point.
+ * Contributors: Vector Informatik GmbH - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.ui.handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
