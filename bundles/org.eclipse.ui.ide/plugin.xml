@@ -1089,9 +1089,8 @@
             id="org.eclipse.ui.ide.markers.copyMarkerResourceQualifiedName"
             name="%command.copyMarkerResourceQualifiedName.name"
             defaultHandler="org.eclipse.ui.internal.views.markers.CopyMarkerResourceQualifiedNameHandler">            
-      </command>    
+      </command>          
    </extension>
-   
    <extension
          point="org.eclipse.ui.commandImages">
       <image
