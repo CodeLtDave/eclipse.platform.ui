@@ -545,10 +545,12 @@ public class ImportOperation extends WorkspaceModifyOperation {
 				targetResource.createLink(
 						createRelativePath(IPath.fromOSString(provider.getFullPath(fileObject)), targetResource), 0,
 						subMonitor.split(50));
-			} else if (ZipFileUtil.isInsideOpenZipFile(targetResource.getLocationURI())) { // $NON-NLS-1$
-				IFolder expandedArchive = targetResource.getProject().getFolder(targetResource.getName());
-				if (expandedArchive.exists()) {
-					expandedArchive.delete(true, subMonitor.split(50));
+			} else if (ZipFileUtil.isInsideOpenZipFile(targetResource.getLocationURI())) {// $NON-NLS-1$
+				// When overwriting an opened Zip File with a new Zip File that has the same
+				// name, the opened zip file needs to be deleted first.
+				IFolder openedZipFile = targetResource.getProject().getFolder(targetResource.getName());
+				if (openedZipFile.exists()) {
+					openedZipFile.delete(true, subMonitor.split(50));
 				}
 				targetResource.create(contentStream, false, subMonitor.split(50));
 			} else if (targetResource.exists()) {
