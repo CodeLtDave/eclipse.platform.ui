@@ -48,12 +48,12 @@
 	   <command
 	          id="org.eclipse.ui.commands.openZipFile"
 	          name="%command.name.openZipFile"
-	          defaultHandler="org.eclipse.ui.handlers.OpenZipFileHandler">
+	          defaultHandler="org.eclipse.ui.ide.fileSystem.zip.OpenZipFileHandler">
 	    </command>
 	    <command
 	          id="org.eclipse.ui.commands.closeZipFile"
 	          name="%command.name.closeZipFile"
-	          defaultHandler="org.eclipse.ui.handlers.CloseZipFileHandler">
+	          defaultHandler="org.eclipse.ui.ide.fileSystem.zip.CloseZipFileHandler">
 	    </command>  
    </extension>
    <extension

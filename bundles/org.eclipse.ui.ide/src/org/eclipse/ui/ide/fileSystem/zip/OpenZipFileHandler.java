@@ -10,7 +10,7 @@
  * Contributors: Vector Informatik GmbH - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ui.handlers;
+package org.eclipse.ui.ide.fileSystem.zip;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
@@ -26,6 +26,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
  * This class represents a handler for opening zip files.
