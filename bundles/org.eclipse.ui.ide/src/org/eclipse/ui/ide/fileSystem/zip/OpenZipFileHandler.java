@@ -14,6 +14,7 @@ package org.eclipse.ui.ide.fileSystem.zip;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IFile;
@@ -61,7 +62,7 @@ public class OpenZipFileHandler extends AbstractHandler {
 					public void run(IProgressMonitor monitor) throws InterruptedException {
 						monitor.beginTask("Opening Zip File", 5); //$NON-NLS-1$
 						try {
-							ZipFileTransformer.openZipFile((IFile) element, monitor, false);
+							ZipFileTransformer.openZipFile((IFile) element, monitor, true);
 						} catch (URISyntaxException | CoreException e) {
 							throw new InterruptedException(e.getMessage());
 						}
