@@ -69,9 +69,7 @@ public class OpenZipFileHandler extends AbstractHandler {
 						monitor.worked(1);
 					}
 				});
-			} catch (InvocationTargetException e) {
-				e.printStackTrace();
-			} catch (InterruptedException e) {
+			} catch (InterruptedException | InvocationTargetException e) {
 				MessageDialog.openError(shell, "Error opening zip file", e.getMessage()); //$NON-NLS-1$
 			}
 		return null;
