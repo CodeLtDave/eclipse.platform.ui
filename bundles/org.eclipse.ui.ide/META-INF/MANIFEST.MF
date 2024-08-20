@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Plugin.name
 Bundle-SymbolicName: org.eclipse.ui.ide; singleton:=true
-Bundle-Version: 3.22.300.qualifier
+Bundle-Version: 3.23.000.qualifier
 Bundle-Activator: org.eclipse.ui.internal.ide.IDEWorkbenchPlugin
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %Plugin.providerName
@@ -13,6 +13,7 @@ Export-Package: org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.ui.ide.dialogs,
  org.eclipse.ui.ide.fileSystem,
+ org.eclipse.ui.ide.fileSystem.zip,
  org.eclipse.ui.ide.undo,
  org.eclipse.ui.internal.ide;x-friends:="org.eclipse.ui.ide.application,org.eclipse.ui.navigator.resources",
  org.eclipse.ui.internal.ide.actions;x-internal:=true,
